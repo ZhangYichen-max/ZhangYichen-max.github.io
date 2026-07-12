@@ -81,11 +81,11 @@
     <h3 class="gohome">ZhangYichen's Website</h3>
     <h2>资源专区</h2>
       <br/>
-    <a class="goback" href="index.html">⬅️</a>
+    <a class="goback" href="sources.html">⬅️</a>
     <br/>
     <div class="top-nav">
-    <input id="search-4"/>
-        <button id="go4file">查询</button>
+    <input id="search-4" placeholder="输入快捷指令"/>
+        <button id="go4file" onclick="checkInput()">查询</button>
 </div>
       
     <p class="sub"></p>
@@ -95,4 +95,16 @@
     </div>
     
 </body>
+    <script>
+        function checkInput() {
+    const input = document.getElementById('search-4').value;
+    
+    if (input === 'zycnote') {
+        
+        window.location.href = 'candy.html';
+    }
+        
+    
+}
+    </script>
 </html>
