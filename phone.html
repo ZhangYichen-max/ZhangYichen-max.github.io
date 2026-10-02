@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>模拟手机桌面 · 存储空间</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* 手机机身 */
+    .phone {
+      position: relative;
+      width: 340px;
+      height: 700px;
+      background: skyblue;
+      border-radius: 44px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8), 0 0 0 8px #2c2c2e;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 状态栏 */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 22px 6px 22px;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-weight: 700;
+      background: transparent;
+      position: relative;
+      z-index: 10;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+    }
+
+    .status-time {
+      letter-spacing: 0.3px;
+    }
+
+    .status-battery {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    .battery-percent {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    /* CSS 电池图标 */
+    .battery-icon {
+      position: relative;
+      width: 24px;
+      height: 12px;
+      border: 1.5px solid #1a1a1a;
+      border-radius: 3px;
+      padding: 1px;
+      display: flex;
+      align-items: center;
+    }
+
+    .battery-icon::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2.5px;
+      height: 5px;
+      background: #1a1a1a;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .battery-level-fill {
+      width: 80%;
+      height: 100%;
+      background: #1a1a1a;
+      border-radius: 1px;
+    }
+
+    /* 主页时间 */
+    .home-time {
+      text-align: center;
+      margin-top: 6px;
+      margin-bottom: 26px;
+      color: #1e2b3a;
+      text-shadow: 0 2px 10px rgba(255, 255, 255, 0.7);
+    }
+
+    .home-time .big-time {
+      font-size: 52px;
+      font-weight: 300;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .home-time .date {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2c3e50;
+      margin-top: 5px;
+    }
+
+    /* 应用网格 */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 14px;
+      padding: 0 18px;
+      margin-top: 8px;
+    }
+
+    .app-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.2s;
+      transform-origin: center;
+    }
+
+    .app-icon:active {
+      transform: scale(0.88);
+      opacity: 0.8;
+    }
+
+    .icon-bg {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+      transition: all 0.15s ease;
+      font-size: 30px;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .app-name {
+      color: #1e2b3a;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
+    }
+
+    .icon-phone { background: linear-gradient(145deg, #5e9cff, #2a6df4); }
+    .icon-message { background: linear-gradient(145deg, #42d77d, #1fa94a); }
+    .icon-camera { background: linear-gradient(145deg, #ff8a5c, #e85d2e); }
+    .icon-music { background: linear-gradient(145deg, #c56bff, #9b3df0); }
+    .icon-settings { background: linear-gradient(145deg, #a0a5b0, #6b7280); }
+
+    /* 底部小横条（视觉指示） */
+    .home-bar {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 5px;
+      background: #ffffff;
+      border-radius: 20px;
+      opacity: 0.9;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      transition: opacity 0.2s, background 0.2s, transform 0.15s;
+      z-index: 500;
+      pointer-events: none;
+    }
+
+    .white-page.show ~ .home-bar {
+      background: #b0b0b0 !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .settings-page.show ~ .home-bar,
+    .about-page.show ~ .home-bar,
+    .storage-page.show ~ .home-bar {
+      background: #c0c0c0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ========== 纯白页面（应用） ========== */
+    .white-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 44px;
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85) rotate(-2deg);
+      filter: blur(6px);
+      transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  filter 0.45s ease;
+      will-change: transform, opacity, filter;
+    }
+
+    .white-page.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0px);
+    }
+
+    /* ========== 设置页面 ========== */
+    .settings-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #f2f2f7;
+      border-radius: 44px;
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85) rotate(2deg);
+      filter: blur(6px);
+      transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  filter 0.45s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      will-change: transform, opacity, filter;
+    }
+
+    .settings-page.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0px);
+    }
+
+    .settings-header {
+      padding: 58px 22px 14px 22px;
+      background: #f2f2f7;
+    }
+
+    .settings-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1c1c1e;
+      letter-spacing: -0.5px;
+    }
+
+    .settings-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 18px 60px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .settings-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .settings-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6c6c70;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 8px 13px 8px 13px;
+    }
+
+    .settings-row {
+      background: #ffffff;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: #1c1c1e;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      position: relative;
+    }
+
+    .settings-row:active {
+      background: #ececec;
+    }
+
+    .settings-row + .settings-row::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 22px;
+      right: 0;
+      height: 0.5px;
+      background: #e0e0e0;
+    }
+
+    .settings-emoji {
+      font-size: 22px;
+      flex-shrink: 0;
+      line-height: 1;
+      width: 32px;
+      text-align: center;
+    }
+
+    .settings-row-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .settings-row-main {
+      font-size: 15px;
+      font-weight: 400;
+      color: #1c1c1e;
+    }
+
+    .settings-arrow {
+      color: #c7c7cc;
+      font-size: 16px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ========== 关于本机页面 ========== */
+    .about-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #f2f2f7;
+      border-radius: 44px;
+      z-index: 400;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85) rotate(-2deg);
+      filter: blur(6px);
+      transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  filter 0.45s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      will-change: transform, opacity, filter;
+    }
+
+    .about-page.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0px);
+    }
+
+    .about-header {
+      padding: 58px 22px 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f2f2f7;
+    }
+
+    .about-back-btn {
+      font-size: 22px;
+      color: #007aff;
+      cursor: pointer;
+      padding: 4px 8px 4px 0;
+      font-weight: 400;
+      transition: opacity 0.15s;
+      line-height: 1;
+    }
+
+    .about-back-btn:active {
+      opacity: 0.5;
+    }
+
+    .about-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1c1c1e;
+    }
+
+    .about-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 18px 60px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* ========== 设备卡片 ========== */
+    .device-card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .device-card .device-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .device-card .device-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1c1c1e;
+      line-height: 1.2;
+    }
+
+    .device-card .device-version {
+      font-size: 13px;
+      font-weight: 400;
+      color: #8e8e93;
+      line-height: 1;
+    }
+
+    /* 检查更新按钮 */
+    .check-update-btn {
+      background: #007aff;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s ease, transform 0.15s ease, opacity 0.2s;
+      box-shadow: 0 3px 10px rgba(0, 122, 255, 0.25);
+      font-family: inherit;
+      letter-spacing: 0.2px;
+      width: 100%;
+    }
+
+    .check-update-btn:active {
+      transform: scale(0.97);
+      background: #0066d6;
+    }
+
+    .check-update-btn.checking {
+      background: #8e8e93;
+      pointer-events: none;
+      opacity: 0.85;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .check-update-btn.checking .spinner {
+      display: block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 关于信息板块 */
+    .about-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .about-row {
+      background: white;
+      padding: 13px 21px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      position: relative;
+      cursor: default;
+      transition: background 0.15s ease;
+    }
+
+    .about-row + .about-row::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 21px;
+      right: 0;
+      height: 0.5px;
+      background: #e0e0e0;
+    }
+
+    .about-row .label {
+      color: #1c1c1e;
+      font-weight: 400;
+    }
+
+    .about-row .value {
+      color: #8e8e93;
+      font-weight: 400;
+    }
+
+    /* 可点击的存储空间行 —— 标签保持黑色 */
+    .about-row.clickable {
+      cursor: pointer;
+    }
+
+    .about-row.clickable:active {
+      background: #ececec;
+    }
+
+    /* 黑色文字（去掉蓝色） */
+    .about-row.clickable .label {
+      color: #1c1c1e;
+    }
+
+    .about-row.clickable .value {
+      color: #8e8e93;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .about-row.clickable .value-arrow {
+      color: #c7c7cc;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* ========== 存储空间页面 ========== */
+    .storage-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #f2f2f7;
+      border-radius: 44px;
+      z-index: 450;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85) rotate(2deg);
+      filter: blur(6px);
+      transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  filter 0.45s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      will-change: transform, opacity, filter;
+    }
+
+    .storage-page.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0px);
+    }
+
+    .storage-header {
+      padding: 58px 22px 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f2f2f7;
+    }
+
+    .storage-back-btn {
+      font-size: 22px;
+      color: #007aff;
+      cursor: pointer;
+      padding: 4px 8px 4px 0;
+      font-weight: 400;
+      transition: opacity 0.15s;
+      line-height: 1;
+    }
+
+    .storage-back-btn:active {
+      opacity: 0.5;
+    }
+
+    .storage-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1c1c1e;
+    }
+
+    .storage-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 18px 60px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      align-items: center;
+    }
+
+    /* 饼状图卡片 */
+    .pie-chart-card {
+      background: white;
+      border-radius: 16px;
+      padding: 26px 22px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .pie-chart {
+      width: 180px;
+      height: 180px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+    }
+
+    .pie-slice {
+      transition: stroke-dasharray 0.6s ease;
+    }
+
+    /* 图例 */
+    .legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #1c1c1e;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend-label {
+      flex: 1;
+      font-weight: 400;
+    }
+
+    .legend-value {
+      color: #8e8e93;
+      font-weight: 400;
+      font-size: 13px;
+    }
+
+    /* 存储详情列表 */
+    .storage-details {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .storage-detail-row {
+      padding: 13px 21px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .storage-detail-row + .storage-detail-row::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 21px;
+      right: 0;
+      height: 0.5px;
+      background: #e0e0e0;
+    }
+
+    .storage-detail-row .label {
+      color: #1c1c1e;
+      font-weight: 400;
+    }
+
+    .storage-detail-row .value {
+      color: #8e8e93;
+      font-weight: 400;
+    }
+
+    /* ========== 底部手势感应区 ========== */
+    .gesture-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      z-index: 600;
+      touch-action: none;
+      background: transparent;
+      pointer-events: auto;
+    }
+
+    /* Toast 提示 */
+    .toast {
+      position: absolute;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(0, 0, 0, 0.78);
+      color: #ffffff;
+      padding: 12px 22px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 700;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" id="phone">
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <div class="status-time" id="statusTime">09:41</div>
+      <div class="status-battery">
+        <span class="battery-percent">80%</span>
+        <div class="battery-icon">
+          <div class="battery-level-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主页时间 -->
+    <div class="home-time">
+      <div class="big-time" id="liveTime">09:41</div>
+      <div class="date" id="liveDate">2025年3月21日 星期五</div>
+    </div>
+
+    <!-- 应用网格 -->
+    <div class="app-grid">
+      <div class="app-icon" data-app="电话">
+        <div class="icon-bg icon-phone">📞</div>
+        <span class="app-name">电话</span>
+      </div>
+      <div class="app-icon" data-app="信息">
+        <div class="icon-bg icon-message">💬</div>
+        <span class="app-name">信息</span>
+      </div>
+      <div class="app-icon" data-app="相机">
+        <div class="icon-bg icon-camera">📷</div>
+        <span class="app-name">相机</span>
+      </div>
+      <div class="app-icon" data-app="音乐">
+        <div class="icon-bg icon-music">🎵</div>
+        <span class="app-name">音乐</span>
+      </div>
+      <div class="app-icon" data-app="设置" id="settingsApp">
+        <div class="icon-bg icon-settings">⚙️</div>
+        <span class="app-name">设置</span>
+      </div>
+    </div>
+
+    <!-- 纯白页面（其他应用） -->
+    <div class="white-page" id="whitePage"></div>
+
+    <!-- ========== 设置页面 ========== -->
+    <div class="settings-page" id="settingsPage">
+      <div class="settings-header">
+        <h1>设置</h1>
+      </div>
+      <div class="settings-content">
+        <div class="settings-section">
+          <div class="settings-section-title">通用</div>
+          <div class="settings-row" id="aboutDeviceRow">
+            <span class="settings-emoji">📱</span>
+            <div class="settings-row-text">
+              <span class="settings-row-main">关于本机</span>
+            </div>
+            <span class="settings-arrow">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 关于本机页面 ========== -->
+    <div class="about-page" id="aboutPage">
+      <div class="about-header">
+        <span class="about-back-btn" id="aboutBackBtn">‹</span>
+        <h1>关于本机</h1>
+      </div>
+      <div class="about-content">
+        <!-- 设备卡片 -->
+        <div class="device-card">
+          <div class="device-title">
+            <span class="device-name">SkyOS</span>
+            <span class="device-version">1.0.0</span>
+          </div>
+          <button class="check-update-btn" id="checkUpdateBtn">
+            <span class="spinner"></span>
+            <span class="btn-text">检查更新</span>
+          </button>
+        </div>
+
+        <!-- 设备信息 -->
+        <div class="about-section">
+          <div class="about-row">
+            <span class="label">设备名称</span>
+            <span class="value">SkyPhone</span>
+          </div>
+          <div class="about-row clickable" id="storageRow">
+            <span class="label">存储空间</span>
+            <span class="value">
+              128 GB
+              <span class="value-arrow">›</span>
+            </span>
+          </div>
+          <div class="about-row">
+            <span class="label">电池容量</span>
+            <span class="value">8000 mAh</span>
+          </div>
+          <div class="about-row">
+            <span class="label">序列号</span>
+            <span class="value">SKY2025SIM001</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 存储空间页面 ========== -->
+    <div class="storage-page" id="storagePage">
+      <div class="storage-header">
+        <span class="storage-back-btn" id="storageBackBtn">‹</span>
+        <h1>存储空间</h1>
+      </div>
+      <div class="storage-content">
+        <!-- 饼状图卡片 -->
+        <div class="pie-chart-card">
+          <svg class="pie-chart" viewBox="0 0 100 100">
+            <!-- 底层可用（灰色） -->
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e5ea" stroke-width="16"/>
+            <!-- 已用部分（蓝色）78/128 ≈ 60.9% → 周长 2πr=263.9，已用 160.8 -->
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#007aff" stroke-width="16"
+                    stroke-dasharray="160.8 103.1"
+                    stroke-dashoffset="0"
+                    transform="rotate(-90 50 50)"
+                    stroke-linecap="butt"/>
+            <!-- 中心文字 -->
+            <text x="50" y="46" text-anchor="middle" font-size="14" font-weight="600" fill="#1c1c1e">78 GB</text>
+            <text x="50" y="60" text-anchor="middle" font-size="8" fill="#8e8e93">已使用</text>
+          </svg>
+
+          <!-- 图例 -->
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-color" style="background:#007aff;"></div>
+              <span class="legend-label">已使用</span>
+              <span class="legend-value">78 GB</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background:#e5e5ea;"></div>
+              <span class="legend-label">可用</span>
+              <span class="legend-value">50 GB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 存储详情列表 -->
+        <div class="storage-details">
+          <div class="storage-detail-row">
+            <span class="label">总容量</span>
+            <span class="value">128 GB</span>
+          </div>
+          <div class="storage-detail-row">
+            <span class="label">已使用</span>
+            <span class="value">78 GB</span>
+          </div>
+          <div class="storage-detail-row">
+            <span class="label">可用空间</span>
+            <span class="value">50 GB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部小横条（纯视觉指示） -->
+    <div class="home-bar" id="homeBar"></div>
+
+    <!-- 底部手势感应区 -->
+    <div class="gesture-area" id="gestureArea"></div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- 实时时钟 ----------
+      function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes}`;
+        document.getElementById('liveTime').textContent = timeStr;
+        document.getElementById('statusTime').textContent = timeStr;
+
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        const weekdays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+        document.getElementById('liveDate').textContent = `${year}年${month}月${day}日 ${weekdays[now.getDay()]}`;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      // ---------- 元素 ----------
+      const whitePage = document.getElementById('whitePage');
+      const gestureArea = document.getElementById('gestureArea');
+      const appIcons = document.querySelectorAll('.app-icon');
+      const settingsApp = document.getElementById('settingsApp');
+      const settingsPage = document.getElementById('settingsPage');
+      const aboutDeviceRow = document.getElementById('aboutDeviceRow');
+      const aboutPage = document.getElementById('aboutPage');
+      const aboutBackBtn = document.getElementById('aboutBackBtn');
+      const checkUpdateBtn = document.getElementById('checkUpdateBtn');
+      const btnText = checkUpdateBtn.querySelector('.btn-text');
+      const storageRow = document.getElementById('storageRow');
+      const storagePage = document.getElementById('storagePage');
+      const storageBackBtn = document.getElementById('storageBackBtn');
+      const toast = document.getElementById('toast');
+
+      // 状态
+      let isWhitePageOpen = false;
+      let isSettingsOpen = false;
+      let isAboutOpen = false;
+      let isStorageOpen = false;
+      let isChecking = false;
+
+      // ---------- 纯白页面 ----------
+      function openWhitePage() {
+        if (isWhitePageOpen) return;
+        whitePage.classList.add('show');
+        isWhitePageOpen = true;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      function closeWhitePage() {
+        if (!isWhitePageOpen) return;
+        whitePage.classList.remove('show');
+        isWhitePageOpen = false;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      // ---------- 设置页面 ----------
+      function openSettings() {
+        if (isSettingsOpen) return;
+        settingsPage.classList.add('show');
+        isSettingsOpen = true;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      function closeSettings() {
+        if (!isSettingsOpen) return;
+        if (isAboutOpen) closeAbout();
+        settingsPage.classList.remove('show');
+        isSettingsOpen = false;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      // ---------- 关于本机页面 ----------
+      function openAbout() {
+        if (isAboutOpen) return;
+        aboutPage.classList.add('show');
+        isAboutOpen = true;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      function closeAbout() {
+        if (!isAboutOpen) return;
+        if (isStorageOpen) closeStorage();
+        aboutPage.classList.remove('show');
+        isAboutOpen = false;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      // ---------- 存储空间页面 ----------
+      function openStorage() {
+        if (isStorageOpen) return;
+        storagePage.classList.add('show');
+        isStorageOpen = true;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      function closeStorage() {
+        if (!isStorageOpen) return;
+        storagePage.classList.remove('show');
+        isStorageOpen = false;
+        if (navigator.vibrate) navigator.vibrate(8);
+      }
+
+      // ---------- Toast 提示 ----------
+      let toastTimer = null;
+      function showToast(message, duration = 2000) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, duration);
+      }
+
+      // ---------- 检查更新逻辑 ----------
+      checkUpdateBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isChecking) return;
+
+        isChecking = true;
+        checkUpdateBtn.classList.add('checking');
+        btnText.textContent = '正在检查更新…';
+        if (navigator.vibrate) navigator.vibrate(10);
+
+        setTimeout(() => {
+          isChecking = false;
+          checkUpdateBtn.classList.remove('checking');
+          btnText.textContent = '检查更新';
+          showToast('已是最新版本 v1.0.0');
+          if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
+        }, 2000);
+      });
+
+      // ---------- 事件绑定 ----------
+      appIcons.forEach(icon => {
+        if (icon.id === 'settingsApp') return;
+        icon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (isSettingsOpen) return;
+          openWhitePage();
+        });
+      });
+
+      settingsApp.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isWhitePageOpen) closeWhitePage();
+        openSettings();
+      });
+
+      aboutDeviceRow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openAbout();
+      });
+
+      aboutBackBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAbout();
+      });
+
+      storageRow.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openStorage();
+      });
+
+      storageBackBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeStorage();
+      });
+
+      // ---------- 底部手势区：上滑返回主页（关闭所有覆盖层）----------
+      let touchStartY = 0;
+      let touchStartTime = 0;
+
+      gestureArea.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+      }, { passive: false });
+
+      gestureArea.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (!touchStartY) return;
+
+        const touchEnd = e.changedTouches[0];
+        const deltaY = touchEnd.clientY - touchStartY;
+        const deltaTime = Date.now() - touchStartTime;
+
+        if (deltaY < -10 || Math.abs(deltaY) > 20) {
+          goHome();
+        } else if (deltaTime < 200 && Math.abs(deltaY) > 5) {
+          goHome();
+        }
+
+        touchStartY = 0;
+        touchStartTime = 0;
+      }, { passive: false });
+
+      // 鼠标模拟
+      let mouseDownY = 0;
+      let mouseDownTime = 0;
+      gestureArea.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        mouseDownY = e.clientY;
+        mouseDownTime = Date.now();
+      });
+
+      gestureArea.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        if (!mouseDownY) return;
+        const deltaY = e.clientY - mouseDownY;
+        const deltaTime = Date.now() - mouseDownTime;
+        if (deltaY < -10 || Math.abs(deltaY) > 20 || (deltaTime < 200 && Math.abs(deltaY) > 5)) {
+          goHome();
+        }
+        mouseDownY = 0;
+        mouseDownTime = 0;
+      });
+
+      window.addEventListener('mouseup', () => {
+        mouseDownY = 0;
+        mouseDownTime = 0;
+      });
+
+      // ★ 直接返回主页：关闭所有覆盖层
+      function goHome() {
+        if (isStorageOpen) closeStorage();
+        if (isAboutOpen) closeAbout();
+        if (isSettingsOpen) closeSettings();
+        if (isWhitePageOpen) closeWhitePage();
+      }
+
+      // 防止事件穿透
+      whitePage.addEventListener('click', (e) => e.stopPropagation());
+      settingsPage.addEventListener('click', (e) => e.stopPropagation());
+      aboutPage.addEventListener('click', (e) => e.stopPropagation());
+      storagePage.addEventListener('click', (e) => e.stopPropagation());
+    })();
+  </script>
+</body>
+</html>
