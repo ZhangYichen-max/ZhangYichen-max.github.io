@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于 · GUMI Blog</title>
+<meta name="description" content="关于 GUMI Blog 和博主">
+<style>
+  :root{
+    --green:#10b981;
+    --green-dark:#0d9488;
+    --green-deep:#065f46;
+    --mint:#ecfdf5;
+    --mint-2:#d1fae5;
+    --ink:#1f2937;
+    --ink-soft:#4b5563;
+    --card:#ffffff;
+    --bg:#f6faf8;
+    --border:#e2e8f0;
+    --shadow:0 2px 12px rgba(16,185,129,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.85;
+  }
+  a{color:var(--green-dark);text-decoration:none;transition:color .2s}
+  a:hover{color:var(--green)}
+
+  header{
+    background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 55%,#a7f3d0 100%);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:10;
+  }
+  .nav{
+    max-width:860px;margin:0 auto;padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--green-deep)}
+  .logo:hover .logo-text{color:var(--green-dark)}
+  .nav-links{display:flex;gap:6px}
+  .nav-links a{padding:6px 14px;border-radius:999px;font-size:.95rem;color:var(--ink-soft)}
+  .nav-links a:hover{background:rgba(255,255,255,.7);color:var(--green-dark)}
+  .nav-links a.active{background:var(--green);color:#fff}
+
+  main{max-width:720px;margin:0 auto;padding:44px 20px 60px}
+
+  .about-card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:38px 40px;box-shadow:var(--shadow);text-align:center;
+  }
+  .about-card .avatar{
+    width:96px;height:96px;margin:0 auto 18px;border-radius:50%;
+    background:linear-gradient(135deg,var(--green),#34d399);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 24px rgba(16,185,129,.35);
+  }
+  .about-card h1{font-size:1.6rem;color:var(--green-deep);margin-bottom:4px}
+  .about-card .sub{color:#6b7280;font-size:.9rem;margin-bottom:20px}
+  .about-card .desc{text-align:left;color:var(--ink-soft)}
+
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+  .fact{
+    background:var(--mint);border-radius:12px;padding:16px 12px;text-align:center;
+  }
+  .fact .num{font-size:1.5rem;font-weight:700;color:var(--green-dark)}
+  .fact .label{font-size:.8rem;color:var(--ink-soft)}
+
+  .links{margin-top:26px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+  .links a{
+    display:inline-block;padding:8px 18px;border-radius:999px;font-size:.9rem;
+    background:var(--mint-2);color:var(--green-dark);
+    transition:background .2s;
+  }
+  .links a:hover{background:var(--green);color:#fff}
+
+  .back-home{
+    display:inline-block;margin-top:30px;padding:8px 22px;border-radius:999px;
+    background:var(--green);color:#fff;font-size:.95rem;
+  }
+  .back-home:hover{background:var(--green-dark);color:#fff}
+
+  footer{
+    border-top:1px solid var(--border);
+    text-align:center;padding:26px 20px;color:#9ca3af;font-size:.85rem;
+  }
+  footer .heart{color:var(--green)}
+
+  @media (max-width:560px){
+    .about-card{padding:26px 22px}
+    .facts{grid-template-columns:1fr;}
+    .nav{padding:12px 16px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a class="logo" href="https://sfile.chatglm.cn/workspace/file/bd/bd70ffe1c7.html" aria-label="GUMI Blog 首页">
+      <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="#10b981"/>
+        <path d="M13 24c0-4 3-7 7-7s7 3 7 7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <circle cx="15.5" cy="16" r="1.8" fill="#fff"/>
+        <circle cx="24.5" cy="16" r="1.8" fill="#fff"/>
+      </svg>
+      <span class="logo-text">GUMI Blog</span>
+    </a>
+    <div class="nav-links">
+      <a href="https://sfile.chatglm.cn/workspace/file/bd/bd70ffe1c7.html">首页</a>
+      <a href="https://sfile.chatglm.cn/workspace/file/27/27121ab115.html" class="active">关于</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="about-card">
+    <div class="avatar" aria-hidden="true">
+      <svg width="52" height="52" viewBox="0 0 40 40" fill="none">
+        <path d="M10 28c0-6 4.5-10 10-10s10 4 10 10" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+        <circle cx="15" cy="17" r="2.4" fill="#fff"/>
+        <circle cx="25" cy="17" r="2.4" fill="#fff"/>
+        <path d="M29 12c1-2 3-2.6 4.5-2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h1>GUMI</h1>
+    <p class="sub">博主 · 写字的人 · 绿色爱好者</p>
+
+    <div class="desc">
+      <p>你好呀，欢迎来到我的小站 🌿</p>
+      <p>这里是 GUMI Blog——一个用来记录想法、沉淀知识、偶尔写点生活碎片的地方。内容大多围绕我感兴趣的话题，想到什么写什么，不追求更新频率，只希望每一篇都不水。</p>
+      <p>如果你想聊聊，欢迎通过下面的链接找到我。</p>
+    </div>
+
+    <div class="facts">
+      <div class="fact">
+        <div class="num">3</div>
+        <div class="label">篇 文 章</div>
+      </div>
+      <div class="fact">
+        <div class="num">1</div>
+        <div class="label">只 猫（虚构）</div>
+      </div>
+      <div class="fact">
+        <div class="num">∞</div>
+        <div class="label">杯 咖啡</div>
+      </div>
+    </div>
+
+    <div class="links">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:example@example.com">Email</a>
+    </div>
+
+    <a class="back-home" href="https://sfile.chatglm.cn/workspace/file/bd/bd70ffe1c7.html">← 去看看文章</a>
+  </div>
+</main>
+
+<footer>
+  <p>GUMI Blog · 由 <span class="heart">♥</span> 与 GitHub Pages 驱动</p>
+</footer>
+
+</body>
+</html>

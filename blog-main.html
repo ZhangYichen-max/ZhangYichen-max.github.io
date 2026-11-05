@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GUMI Blog</title>
+<meta name="description" content="GUMI Blog —— 记录与分享的个人博客">
+<meta property="og:title" content="GUMI Blog">
+<meta property="og:description" content="记录与分享的个人博客">
+<style>
+  :root{
+    --green:#10b981;
+    --green-dark:#0d9488;
+    --green-deep:#065f46;
+    --mint:#ecfdf5;
+    --mint-2:#d1fae5;
+    --ink:#1f2937;
+    --ink-soft:#4b5563;
+    --card:#ffffff;
+    --bg:#f6faf8;
+    --border:#e2e8f0;
+    --shadow:0 2px 12px rgba(16,185,129,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.75;
+  }
+  a{color:var(--green-dark);text-decoration:none;transition:color .2s}
+  a:hover{color:var(--green)}
+
+  /* ---- 顶部导航 ---- */
+  header{
+    background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 55%,#a7f3d0 100%);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);
+  }
+  .nav{
+    max-width:860px;margin:0 auto;padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--green-deep)}
+  .logo svg{flex:none}
+  .logo:hover .logo-text{color:var(--green-dark)}
+  .nav-links{display:flex;gap:6px}
+  .nav-links a{
+    padding:6px 14px;border-radius:999px;font-size:.95rem;color:var(--ink-soft);
+  }
+  .nav-links a:hover{background:rgba(255,255,255,.7);color:var(--green-dark)}
+  .nav-links a.active{background:var(--green);color:#fff}
+
+  /* ---- Hero ---- */
+  .hero{
+    max-width:860px;margin:0 auto;padding:56px 20px 40px;
+    display:flex;align-items:center;justify-content:space-between;gap:36px;
+  }
+  .hero-text{flex:1;text-align:center;min-width:0}
+  .hero h1{
+    font-size:2rem;letter-spacing:.5px;color:var(--green-deep);margin-bottom:10px;
+  }
+  .hero p{color:var(--ink-soft);max-width:520px;margin:0 auto}
+
+  /* ---- 立绘（Hero 区） ---- */
+  .hero-art{
+    flex:none;width:230px;border-radius:18px;
+    box-shadow:0 10px 36px rgba(16,185,129,.28);
+    border:4px solid #fff;
+    animation:floaty 5s ease-in-out infinite;
+  }
+  .hero-art:hover{animation-play-state:paused}
+  @keyframes floaty{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+  }
+
+  /* ---- 侧边停靠图标 ---- */
+  #gumi-dock{
+    position:fixed;right:0;top:50%;z-index:50;
+    width:56px;height:56px;margin-top:-28px;
+    border-radius:50% 0 0 50%;
+    cursor:pointer;
+    background:linear-gradient(135deg,var(--green),#34d399);
+    border:none;
+    box-shadow:0 4px 18px rgba(16,185,129,.4);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:translateX(100%);
+    transition:opacity .35s,transform .35s;
+  }
+  #gumi-dock:hover{box-shadow:0 4px 26px rgba(16,185,129,.6)}
+  #gumi-dock.show{opacity:1;transform:translateX(0)}
+  #gumi-dock svg{flex:none}
+  #gumi-dock .chev{
+    position:absolute;left:7px;top:50%;transform:translateY(-50%);
+    animation:nudge 1.6s ease-in-out infinite;
+  }
+  @keyframes nudge{
+    0%,100%{transform:translate(-2px,-50%);opacity:.65}
+    50%{transform:translate(2px,-50%);opacity:1}
+  }
+
+  /* ---- 展开的立绘面板 ---- */
+  #gumi-panel{
+    position:fixed;right:18px;top:50%;z-index:51;
+    width:210px;max-width:70vw;
+    border-radius:18px;overflow:hidden;cursor:pointer;
+    border:4px solid #fff;
+    box-shadow:0 12px 44px rgba(16,185,129,.4);
+    opacity:0;visibility:hidden;
+    transform:translateY(-50%) translateX(120%) scale(.8);
+    transition:opacity .35s,transform .35s cubic-bezier(.34,1.56,.64,1),visibility .35s;
+  }
+  #gumi-panel img{width:100%;display:block}
+  #gumi-panel.open{
+    opacity:1;visibility:visible;
+    transform:translateY(-50%) translateX(0) scale(1);
+  }
+
+  /* ---- 主体 ---- */
+  main{max-width:860px;margin:0 auto;padding:10px 20px 60px}
+  .section-title{
+    display:flex;align-items:center;gap:10px;
+    font-size:1.2rem;color:var(--green-deep);margin:30px 0 18px;font-weight:700;
+  }
+  .section-title::before{content:"";width:4px;height:20px;border-radius:2px;background:var(--green)}
+
+  .post-list{display:flex;flex-direction:column;gap:18px}
+  .post-card{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:22px 24px;box-shadow:var(--shadow);
+    transition:transform .2s,box-shadow .2s,border-color .2s;
+    display:block;color:inherit;
+  }
+  .post-card:hover{
+    transform:translateY(-3px);box-shadow:0 8px 24px rgba(16,185,129,.15);
+    border-color:var(--mint-2);
+  }
+  .post-meta{font-size:.85rem;color:#6b7280;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+  .tag{
+    display:inline-block;padding:1px 10px;border-radius:999px;font-size:.78rem;
+    background:var(--mint-2);color:var(--green-dark);
+  }
+  .post-card h2{font-size:1.15rem;color:var(--ink);margin-bottom:6px}
+  .post-card p{font-size:.92rem;color:var(--ink-soft)}
+
+  /* ---- 页脚 ---- */
+  footer{
+    border-top:1px solid var(--border);
+    text-align:center;padding:26px 20px;color:#9ca3af;font-size:.85rem;
+  }
+  footer .heart{color:var(--green)}
+
+  @media (max-width:700px){
+    .hero{flex-direction:column-reverse;gap:24px;padding:32px 16px 28px}
+    .hero-art{width:56%;max-width:200px}
+    #gumi-dock{width:46px;height:46px;margin-top:-23px}
+    #gumi-dock svg{transform:scale(.85)}
+    #gumi-panel{width:150px}
+  }
+  @media (max-width:560px){
+    .hero h1{font-size:1.6rem}
+    .nav{padding:12px 16px}
+    .post-card{padding:18px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a class="logo" href="https://sfile.chatglm.cn/workspace/file/f9/f92f8952fe.html" aria-label="GUMI Blog 首页">
+      <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="#10b981"/>
+        <path d="M13 24c0-4 3-7 7-7s7 3 7 7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <circle cx="15.5" cy="16" r="1.8" fill="#fff"/>
+        <circle cx="24.5" cy="16" r="1.8" fill="#fff"/>
+      </svg>
+      <span class="logo-text">GUMI Blog</span>
+    </a>
+    <div class="nav-links">
+      <a href="https://sfile.chatglm.cn/workspace/file/f9/f92f8952fe.html" class="active">首页</a>
+      <a href="https://sfile.chatglm.cn/workspace/file/27/27121ab115.html">关于</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Hi，欢迎来到 GUMI Blog 🌿</h1>
+    <p>在这里记录想法、分享见闻。慢下来，写点值得留下的东西。</p>
+  </div>
+  <img class="hero-art" src="https://sfile.chatglm.cn/workspace/image/35/356aa71cfe.jpg" alt="GUMI 立绘">
+</section>
+
+<main>
+  <h2 class="section-title">最新文章</h2>
+  <div class="post-list">
+
+    <a class="post-card" href="https://sfile.chatglm.cn/workspace/file/45/45b6e0c9d0.html">
+      <div class="post-meta">
+        <span>2026-11-05</span>
+        <span class="tag">随笔</span>
+      </div>
+      <h2>你好，世界：博客的第一篇文章</h2>
+      <p>每一篇博客都从第一行字开始。这里写文章的摘要，两三句话勾起读者的兴趣……</p>
+    </a>
+
+    <a class="post-card" href="https://sfile.chatglm.cn/workspace/file/45/45b6e0c9d0.html">
+      <div class="post-meta">
+        <span>2026-10-20</span>
+        <span class="tag">技术</span>
+      </div>
+      <h2>用 GitHub Pages 免费搭建个人博客</h2>
+      <p>零成本、零服务器，把静态页面托管到 GitHub Pages 的完整流程记录……</p>
+    </a>
+
+    <a class="post-card" href="https://sfile.chatglm.cn/workspace/file/45/45b6e0c9d0.html">
+      <div class="post-meta">
+        <span>2026-09-18</span>
+        <span class="tag">生活</span>
+      </div>
+      <h2>秋天的第一杯奶茶与一些碎碎念</h2>
+      <p>记录一个平凡的下午：阳光、落叶，和一点小小的幸福感……</p>
+    </a>
+
+  </div>
+</main>
+
+<footer>
+  <p>GUMI Blog · 由 <span class="heart">♥</span> 与 GitHub Pages 驱动</p>
+</footer>
+
+<!-- 侧边停靠图标（滚动后出现，点击展开立绘） -->
+<button id="gumi-dock" aria-label="展开 GUMI 立绘" title="点我一下 ✨">
+  <svg class="chev" width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true">
+    <path d="M6 1L1.5 6 6 11" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+    <path d="M10 28c0-6 4.5-10 10-10s10 4 10 10" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+    <circle cx="15" cy="17" r="2.4" fill="#fff"/>
+    <circle cx="25" cy="17" r="2.4" fill="#fff"/>
+    <path d="M29 12c1-2 3-2.6 4.5-2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<!-- 展开状态的立绘 -->
+<div id="gumi-panel" role="button" tabindex="0" aria-label="收起 GUMI 立绘" title="再点一下收起">
+  <img src="https://sfile.chatglm.cn/workspace/image/35/356aa71cfe.jpg" alt="GUMI 立绘">
+</div>
+
+<script>
+(function(){
+  var dock  = document.getElementById('gumi-dock');
+  var panel = document.getElementById('gumi-panel');
+  var THRESHOLD = 300; // 滚过多少像素后收起立绘
+
+  function onScroll(){
+    var past = window.scrollY > THRESHOLD;
+    dock.classList.toggle('show', past);
+    if(!past) panel.classList.remove('open'); // 回到顶部时自动收起
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  function togglePanel(e){
+    e.stopPropagation();
+    panel.classList.toggle('open');
+  }
+  dock.addEventListener('click', togglePanel);
+  panel.addEventListener('click', togglePanel);
+
+  // 键盘可达性（dock 已是 button，原生支持 Enter/Space）
+  panel.addEventListener('keydown', function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePanel(e);}
+  });
+
+  // 按 Esc 收起
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape') panel.classList.remove('open');
+  });
+})();
+</script>
+
+</body>
+</html>
