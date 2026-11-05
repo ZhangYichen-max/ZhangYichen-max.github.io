@@ -28,6 +28,18 @@
   }
   a{text-decoration:none}
 
+  /* ---- 淡化背景：https://sfile.chatglm.cn/workspace/image/ad/ad3cd662c8.jpg 随滚动视差 ---- */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;
+    background:url("https://sfile.chatglm.cn/workspace/image/ad/ad3cd662c8.jpg") center 30% / cover no-repeat fixed;
+    opacity:.13;
+    pointer-events:none;
+  }
+  @media (max-width:768px){
+    /* 移动端不支持 fixed 附件，改用固定层 */
+    body::before{background-attachment:scroll;background-position:center 12%}
+  }
+
   /* ---- 返回按钮 ---- */
   .back{
     position:fixed;top:22px;left:22px;z-index:10;
@@ -83,6 +95,39 @@
     box-shadow:0 6px 18px rgba(16,185,129,.35);
   }
 
+  /* ---- 搜索框 ---- */
+  .search-wrap{display:flex;justify-content:center;margin:6px auto 0;padding:0 20px}
+  .search-box{
+    width:100%;max-width:460px;
+    display:flex;align-items:center;gap:10px;
+    padding:10px 18px;border-radius:999px;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+    border:1px solid rgba(16,185,129,.25);
+    box-shadow:0 2px 12px rgba(16,185,129,.12);
+    transition:box-shadow .2s,border-color .2s;
+  }
+  .search-box:focus-within{border-color:var(--green);box-shadow:0 4px 18px rgba(16,185,129,.25)}
+  .search-box svg{flex:none;color:var(--green-dark)}
+  .search-box input{
+    flex:1;border:none;outline:none;background:transparent;
+    font-size:.98rem;font-family:inherit;color:var(--ink);min-width:0;
+  }
+  .search-box input::placeholder{color:#94a3b8}
+  .search-clear{
+    border:none;background:var(--mint-2);color:var(--green-dark);
+    width:24px;height:24px;border-radius:50%;cursor:pointer;flex:none;
+    display:none;align-items:center;justify-content:center;font-size:14px;line-height:1;
+  }
+  .search-clear.show{display:flex}
+
+  /* ---- 无结果提示 ---- */
+  .no-result{
+    display:none;text-align:center;padding:44px 20px;
+    color:var(--ink-soft);font-size:.95rem;
+  }
+  .no-result.show{display:block;animation:fadein .3s ease}
+  .no-result b{color:var(--green-deep)}
+
   /* ---- 卡片区 ---- */
   main{
     width:100%;max-width:900px;margin:0 auto;
@@ -126,12 +171,25 @@
   }
   .empty .hint b{display:block;color:var(--green-deep);font-size:.98rem;margin-bottom:3px}
   .empty .hint span{font-size:.82rem}
+  .empty[hidden]{display:none}
 
   /* ---- 页脚 ---- */
   footer{
-    text-align:center;padding:24px 20px 30px;
+    text-align:center;padding:34px 20px 36px;
     color:var(--green-deep);font-size:.88rem;
   }
+  footer .foot-disc{
+    width:34px;height:34px;margin:0 auto 12px;border-radius:50%;
+    background:radial-gradient(circle at center,#fff 0 14%,var(--green) 15% 32%,var(--green-deep) 33% 100%);
+    box-shadow:0 4px 14px rgba(16,185,129,.35);
+    animation:spin 7s linear infinite;
+  }
+  footer .foot-line{
+    width:120px;height:1px;margin:0 auto 14px;
+    background:linear-gradient(90deg,transparent,rgba(6,95,70,.35),transparent);
+  }
+  footer p{opacity:.85}
+  footer .foot-sub{font-size:.8rem;margin-top:4px;opacity:.6}
 
   @media (max-width:560px){
     header{padding-top:64px 16px 0}
@@ -144,7 +202,7 @@
 </head>
 <body>
 
-<a class="back" href="index.html" aria-label="返回首页">
+<a class="back" href="https://sfile.chatglm.cn/workspace/file/31/31b1068949.html" aria-label="返回首页">
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
@@ -162,6 +220,17 @@
   <button class="tab" data-tab="collection" role="tab" aria-selected="false">典藏</button>
 </div>
 
+<div class="search-wrap">
+  <div class="search-box">
+    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+      <circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 12l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <input type="search" id="song-search" placeholder="搜索歌名或歌手…" autocomplete="off">
+    <button class="search-clear" id="search-clear" aria-label="清空搜索">✕</button>
+  </div>
+</div>
+
 <main>
 
   <!-- ==== 推荐 ==== -->
@@ -171,7 +240,7 @@
       <h2>弱虫モンブラン</h2>
       <p class="desc">DECO*27 · feat. GUMI</p>
       <div class="player-wrap">
-        <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="175" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/cn/song/yowamushi-mont-blanc-feat-gumi/573839784"></iframe>
+        <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="175" style="width:100%;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/cn/song/yowamushi-mont-blanc-feat-gumi/573839784"></iframe>
       </div>
     </div>
 
@@ -179,23 +248,24 @@
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
     <div class="empty">
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
     <div class="empty">
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
+    <div class="no-result">♪ 没有找到「<b class="nr-q"></b>」相关的歌</div>
   </section>
 
   <!-- ==== 典藏 ==== -->
@@ -205,36 +275,40 @@
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
     <div class="empty">
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
     <div class="empty">
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
     <div class="empty">
       <div class="plus" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
       </div>
-      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+      <div class="hint"><b>敬请期待</b><span>新歌筹备中，敬请期待 ♪</span></div>
     </div>
 
+    <div class="no-result">♪ 没有找到「<b class="nr-q"></b>」相关的歌</div>
   </section>
 
 </main>
 
 <footer>
-  <p>©️张轶尘 Copyright 2026</p>
+  <div class="foot-disc" aria-hidden="true"></div>
+  <div class="foot-line" aria-hidden="true"></div>
+  <p>♪ XiMiMusic · 收藏那些值得单曲循环的歌</p>
+  <p class="foot-sub">©️张轶尘 Copyright 2026</p>
 </footer>
 
 <script>
@@ -252,6 +326,43 @@
         p.classList.toggle('active', p.id === 'panel-' + tab.dataset.tab);
       });
     });
+  });
+})();
+
+/* ---- 搜索 ---- */
+(function(){
+  var input = document.getElementById('song-search');
+  var clearBtn = document.getElementById('search-clear');
+  var panels = document.querySelectorAll('.tab-panel');
+
+  function filter(){
+    var q = input.value.trim().toLowerCase();
+    clearBtn.classList.toggle('show', q.length > 0);
+    panels.forEach(function(panel){
+      var visible = 0;
+      panel.querySelectorAll('.card').forEach(function(card){
+        var text = (card.querySelector('h2') ? card.querySelector('h2').textContent : '') + ' ' +
+                   (card.querySelector('.desc') ? card.querySelector('.desc').textContent : '');
+        var hit = !q || text.toLowerCase().indexOf(q) !== -1;
+        card.style.display = hit ? '' : 'none';
+        if (hit) visible++;
+      });
+      panel.querySelectorAll('.empty').forEach(function(el){
+        el.hidden = q.length > 0;   /* 搜索时隐藏占位卡 */
+      });
+      var nr = panel.querySelector('.no-result');
+      if (nr){
+        nr.querySelector('.nr-q').textContent = input.value.trim();
+        nr.classList.toggle('show', q.length > 0 && visible === 0);
+      }
+    });
+  }
+
+  input.addEventListener('input', filter);
+  clearBtn.addEventListener('click', function(){
+    input.value = '';
+    filter();
+    input.focus();
   });
 })();
 </script>
