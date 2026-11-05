@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XiMiMusic</title>
+<meta name="description" content="XiMiMusic —— 我的音乐收藏">
+<style>
+  :root{
+    --green:#10b981;
+    --green-dark:#0d9488;
+    --green-deep:#065f46;
+    --mint:#ecfdf5;
+    --mint-2:#d1fae5;
+    --ink:#1f2937;
+    --ink-soft:#4b5563;
+    --card:#ffffff;
+    --border:#e2e8f0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    min-height:100vh;
+    background:linear-gradient(160deg,#ecfdf5 0%,#d1fae5 45%,#a7f3d0 100%);
+    background-attachment:fixed;
+    display:flex;flex-direction:column;
+    color:var(--ink);
+  }
+  a{text-decoration:none}
+
+  /* ---- 返回按钮 ---- */
+  .back{
+    position:fixed;top:22px;left:22px;z-index:10;
+    display:inline-flex;align-items:center;gap:8px;
+    padding:9px 20px 9px 14px;border-radius:999px;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+    color:var(--green-deep);font-size:.95rem;font-weight:600;
+    border:1px solid rgba(16,185,129,.25);
+    box-shadow:0 2px 10px rgba(16,185,129,.15);
+    transition:background .2s,transform .2s,box-shadow .2s;
+  }
+  .back:hover{
+    background:#fff;transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(16,185,129,.25);
+  }
+  .back svg{flex:none}
+
+  /* ---- 顶部 ---- */
+  header{
+    width:100%;max-width:900px;margin:0 auto;
+    padding:76px 20px 0;text-align:center;
+  }
+  .disc{
+    width:84px;height:84px;margin:0 auto 16px;border-radius:50%;
+    background:radial-gradient(circle at center,#fff 0 14%,var(--green) 15% 30%,#065f46 31% 100%);
+    box-shadow:0 8px 26px rgba(16,185,129,.4);
+    animation:spin 7s linear infinite;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .disc span{
+    width:13px;height:13px;border-radius:50%;
+    background:#fff;box-shadow:inset 0 0 0 3px var(--green);
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  h1{font-size:1.8rem;color:var(--green-deep);letter-spacing:1px}
+  .sub{color:var(--ink-soft);font-size:.95rem;margin-top:6px}
+
+  /* ---- 选项卡 ---- */
+  .tabs{
+    display:flex;justify-content:center;gap:10px;
+    margin:30px auto 8px;
+  }
+  .tab{
+    padding:9px 30px;border-radius:999px;border:none;cursor:pointer;
+    font-size:1rem;font-weight:600;font-family:inherit;
+    background:rgba(255,255,255,.65);color:var(--ink-soft);
+    border:1px solid rgba(16,185,129,.2);
+    transition:background .2s,color .2s,transform .2s,box-shadow .2s;
+  }
+  .tab:hover{background:#fff;transform:translateY(-1px)}
+  .tab.active{
+    background:var(--green);color:#fff;
+    box-shadow:0 6px 18px rgba(16,185,129,.35);
+  }
+
+  /* ---- 卡片区 ---- */
+  main{
+    width:100%;max-width:900px;margin:0 auto;
+    padding:26px 20px 46px;flex:1;
+  }
+  .tab-panel{display:none}
+  .tab-panel.active{display:block;animation:fadein .35s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    box-shadow:0 4px 16px rgba(16,185,129,.08);
+    padding:24px 26px;margin-bottom:20px;
+  }
+  .card h2{
+    font-size:1.1rem;color:var(--green-deep);margin-bottom:6px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .card h2::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--green);flex:none}
+  .card .desc{font-size:.9rem;color:var(--ink-soft);margin-bottom:16px}
+
+  .player-wrap{
+    border-radius:10px;overflow:hidden;
+    box-shadow:0 6px 20px rgba(6,95,70,.15);
+  }
+  .player-wrap iframe{display:block;width:100%;height:175px;border:0}
+
+  /* ---- 空白占位卡片 ---- */
+  .empty{
+    border:2px dashed #a7f3d0;border-radius:16px;
+    background:rgba(255,255,255,.4);
+    padding:30px 26px;margin-bottom:20px;
+    display:flex;align-items:center;gap:18px;
+    color:#94a3b8;transition:border-color .2s,background .2s;
+  }
+  .empty:hover{border-color:var(--green);background:rgba(255,255,255,.7)}
+  .empty .plus{
+    width:46px;height:46px;border-radius:50%;flex:none;
+    background:var(--mint-2);color:var(--green-dark);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .empty .hint b{display:block;color:var(--green-deep);font-size:.98rem;margin-bottom:3px}
+  .empty .hint span{font-size:.82rem}
+
+  /* ---- 页脚 ---- */
+  footer{
+    text-align:center;padding:24px 20px 30px;
+    color:var(--green-deep);font-size:.88rem;
+  }
+
+  @media (max-width:560px){
+    header{padding-top:64px 16px 0}
+    h1{font-size:1.45rem}
+    .tab{padding:8px 22px;font-size:.92rem}
+    .card,.empty{padding:20px 18px}
+    .back{top:14px;left:14px;padding:8px 16px 8px 12px}
+  }
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html" aria-label="返回首页">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  返回首页
+</a>
+
+<header>
+  <div class="disc" aria-hidden="true"><span></span></div>
+  <h1>XiMiMusic</h1>
+  <p class="sub">♪ 收藏那些值得单曲循环的歌</p>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="recommend" role="tab" aria-selected="true">推荐</button>
+  <button class="tab" data-tab="collection" role="tab" aria-selected="false">典藏</button>
+</div>
+
+<main>
+
+  <!-- ==== 推荐 ==== -->
+  <section class="tab-panel active" id="panel-recommend">
+
+    <div class="card">
+      <h2>弱虫モンブラン</h2>
+      <p class="desc">DECO*27 · feat. GUMI</p>
+      <div class="player-wrap">
+        <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="175" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/cn/song/yowamushi-mont-blanc-feat-gumi/573839784"></iframe>
+      </div>
+    </div>
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+  </section>
+
+  <!-- ==== 典藏 ==== -->
+  <section class="tab-panel" id="panel-collection">
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+    <div class="empty">
+      <div class="plus" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="hint"><b>待添加</b><span>复制一张 .card 卡片，替换标题与播放器</span></div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>©️张轶尘 Copyright 2026</p>
+</footer>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.tab');
+  var panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){
+        t.classList.toggle('active', t === tab);
+        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      });
+      panels.forEach(function(p){
+        p.classList.toggle('active', p.id === 'panel-' + tab.dataset.tab);
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
