@@ -146,6 +146,32 @@
   .post-card h2{font-size:1.15rem;color:var(--ink);margin-bottom:6px}
   .post-card p{font-size:.92rem;color:var(--ink-soft)}
 
+  /* ---- 搜索 ---- */
+  .search-wrap{display:flex;justify-content:center;margin:14px 0 20px}
+  .search-box{
+    width:100%;max-width:460px;
+    display:flex;align-items:center;gap:10px;
+    padding:10px 18px;border-radius:999px;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+    border:1px solid rgba(16,185,129,.25);
+    box-shadow:0 2px 12px rgba(16,185,129,.12);
+    transition:box-shadow .2s,border-color .2s;
+  }
+  .search-box:focus-within{border-color:var(--green);box-shadow:0 4px 18px rgba(16,185,129,.25)}
+  .search-box svg{flex:none;color:var(--green-dark)}
+  .search-box input{flex:1;border:none;outline:none;background:transparent;font-size:.98rem;font-family:inherit;color:var(--ink);min-width:0}
+  .search-box input::placeholder{color:#94a3b8}
+  .search-clear{
+    border:none;background:var(--mint-2,#d1fae5);color:#0d9488;
+    width:24px;height:24px;border-radius:50%;cursor:pointer;flex:none;
+    display:none;align-items:center;justify-content:center;font-size:14px;line-height:1;
+  }
+  .search-clear.show{display:flex}
+  .post-card[hidden]{display:none}
+  .no-result{display:none;text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:.95rem}
+  .no-result.show{display:block}
+  .no-result b{color:var(--green-deep)}
+
   /* ---- 页脚 ---- */
   footer{
     border-top:1px solid var(--border);
@@ -186,9 +212,9 @@
           <path d="M8 2v8M4.5 7L8 10.5 11.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M3 13h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>下载App</a>
-      <a href="index.html">回主站</a>
+      <a href="https://sfile.chatglm.cn/workspace/file/31/31b1068949.html">回主站</a>
       <a href="#" class="active">首页</a>
-      <a href="blog-about.html">关于</a>
+      <a href="https://sfile.chatglm.cn/workspace/file/08/08031135ca.html">关于</a>
     </div>
   </nav>
 </header>
@@ -198,14 +224,26 @@
     <h1>Hi，欢迎来到 GUMI Blog 🌿</h1>
     <p>在这里记录想法、分享见闻。慢下来，写点值得留下的东西。</p>
   </div>
-  <img class="hero-art" src="gumi.jpg" alt="GUMI 立绘">
+  <img class="hero-art" src="https://sfile.chatglm.cn/workspace/image/ad/ad3cd662c8.jpg" alt="GUMI 立绘">
 </section>
 
 <main>
   <h2 class="section-title">最新文章</h2>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+        <circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 12l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input type="search" id="post-search" placeholder="搜索文章标题或摘要…" autocomplete="off">
+      <button class="search-clear" id="post-search-clear" aria-label="清空搜索">✕</button>
+    </div>
+  </div>
+
   <div class="post-list">
 
-    <a class="post-card" href="blog-post.html">
+    <a class="post-card" href="https://sfile.chatglm.cn/workspace/file/9e/9eadabf555.html">
       <div class="post-meta">
         <span>2026-11-05</span>
         <span class="tag">随笔</span>
@@ -218,6 +256,7 @@
 
     
 
+    <div class="no-result" id="post-no-result">✎ 没有找到「<b id="post-nr-q"></b>」相关的文章</div>
   </div>
 </main>
 
@@ -240,7 +279,7 @@
 
 <!-- 展开状态的立绘 -->
 <div id="gumi-panel" role="button" tabindex="0" aria-label="收起 GUMI 立绘" title="再点一下收起">
-  <img src="gumi.jpg" alt="GUMI 立绘">
+  <img src="https://sfile.chatglm.cn/workspace/image/ad/ad3cd662c8.jpg" alt="GUMI 立绘">
 </div>
 
 <script>
@@ -273,6 +312,31 @@
   document.addEventListener('keydown', function(e){
     if(e.key==='Escape') panel.classList.remove('open');
   });
+})();
+
+/* ---- 文章搜索 ---- */
+(function(){
+  var input = document.getElementById('post-search');
+  if(!input) return;
+  var clearBtn = document.getElementById('post-search-clear');
+  var cards = document.querySelectorAll('.post-card');
+  var nr = document.getElementById('post-no-result');
+  var nrQ = document.getElementById('post-nr-q');
+
+  function filter(){
+    var q = input.value.trim().toLowerCase();
+    clearBtn.classList.toggle('show', q.length > 0);
+    var visible = 0;
+    cards.forEach(function(card){
+      var hit = !q || card.textContent.toLowerCase().indexOf(q) !== -1;
+      card.hidden = !hit;
+      if (hit) visible++;
+    });
+    nrQ.textContent = input.value.trim();
+    nr.classList.toggle('show', q.length > 0 && visible === 0);
+  }
+  input.addEventListener('input', filter);
+  clearBtn.addEventListener('click', function(){ input.value=''; filter(); input.focus(); });
 })();
 </script>
 
