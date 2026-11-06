@@ -1,4 +1,4 @@
 Admin 123456
-test 123
+test 123456
 zyc 123456
 lml 666
