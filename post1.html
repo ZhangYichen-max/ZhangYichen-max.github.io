@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你好，世界：博客的第一篇文章 · GUMI Blog</title>
+<meta name="description" content="GUMI Blog 的第一篇文章，从这里开始记录。">
+<style>
+  :root{
+    --green:#10b981;
+    --green-dark:#0d9488;
+    --green-deep:#065f46;
+    --mint:#ecfdf5;
+    --mint-2:#d1fae5;
+    --ink:#1f2937;
+    --ink-soft:#4b5563;
+    --card:#ffffff;
+    --bg:#f6faf8;
+    --border:#e2e8f0;
+    --shadow:0 2px 12px rgba(16,185,129,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.85;
+  }
+  a{color:var(--green-dark);text-decoration:none;transition:color .2s}
+  a:hover{color:var(--green)}
+
+  header{
+    background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 55%,#a7f3d0 100%);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:10;
+  }
+  .nav{
+    max-width:860px;margin:0 auto;padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--green-deep)}
+  .logo:hover .logo-text{color:var(--green-dark)}
+  .nav-links{display:flex;gap:6px}
+  .nav-links a{padding:6px 14px;border-radius:999px;font-size:.95rem;color:var(--ink-soft)}
+  .nav-links a:hover{background:rgba(255,255,255,.7);color:var(--green-dark)}
+  .nav-links a.active{background:var(--green);color:#fff}
+  .nav-links a.dl-app{background:var(--green);color:#fff;font-weight:600}
+  .nav-links a.dl-app:hover{background:var(--green-dark);color:#fff;transform:translateY(-1px)}
+
+
+  main{max-width:720px;margin:0 auto;padding:44px 20px 60px}
+
+  .crumb{font-size:.85rem;color:#6b7280;margin-bottom:14px}
+  .crumb a{color:var(--green-dark)}
+
+  article{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:36px 38px;box-shadow:var(--shadow);
+  }
+  .post-header{padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:26px}
+  .post-meta{font-size:.85rem;color:#6b7280;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+  .tag{display:inline-block;padding:1px 10px;border-radius:999px;font-size:.78rem;background:var(--mint-2);color:var(--green-dark)}
+  .post-title{font-size:1.65rem;line-height:1.4;color:var(--ink)}
+
+  .post-body h2{
+    font-size:1.2rem;color:var(--green-deep);margin:30px 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .post-body h2::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--green);flex:none}
+  .post-body p{margin-bottom:14px;color:var(--ink-soft)}
+  .post-body blockquote{
+    margin:18px 0;padding:12px 18px;border-left:4px solid var(--green);
+    background:var(--mint);border-radius:0 10px 10px 0;color:var(--green-deep);
+  }
+  .post-body code{
+    background:var(--mint-2);color:var(--green-dark);
+    padding:2px 7px;border-radius:6px;font-size:.88em;
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  }
+  .post-body pre{
+    background:#0f2e24;color:#a7f3d0;border-radius:12px;
+    padding:18px 20px;overflow-x:auto;margin:18px 0;line-height:1.6;
+  }
+  .post-body pre code{background:none;color:inherit;padding:0}
+  .post-body img{max-width:100%;border-radius:12px}
+
+  .post-footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .back-home{
+    display:inline-block;padding:8px 20px;border-radius:999px;
+    background:var(--green);color:#fff;font-size:.95rem;
+    transition:background .2s;
+  }
+  .back-home:hover{background:var(--green-dark);color:#fff}
+
+  footer{
+    border-top:1px solid var(--border);
+    text-align:center;padding:26px 20px;color:#9ca3af;font-size:.85rem;
+  }
+  footer .heart{color:var(--green)}
+
+  @media (max-width:560px){
+    article{padding:24px 20px}
+    .post-title{font-size:1.35rem}
+    .nav{padding:12px 16px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a class="logo" href="blog-main.html" aria-label="GUMI Blog 首页">
+      <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="#10b981"/>
+        <path d="M13 24c0-4 3-7 7-7s7 3 7 7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <circle cx="15.5" cy="16" r="1.8" fill="#fff"/>
+        <circle cx="24.5" cy="16" r="1.8" fill="#fff"/>
+      </svg>
+      <span class="logo-text">GUMI Blog</span>
+    </a>
+    <div class="nav-links">
+      <a href="blog-1.0.apk" download class="dl-app" aria-label="下载 App">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="vertical-align:-2px;margin-right:4px">
+          <path d="M8 2v8M4.5 7L8 10.5 11.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 13h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>下载App</a>
+      <a href="index.html">回主站</a>
+      <a href="blog-main.html">首页</a>
+      <a href="blog-about.html">关于</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <p class="crumb"><a href="blog-main.html">首页</a> / 正文</p>
+
+  <article>
+    <div class="post-header">
+      <div class="post-meta">
+        <span>2026-11-06</span>
+        <span class="tag">摘要</span>
+      </div>
+      <h1 class="post-title">哈哈哈</h1>
+    </div>
+
+    <div class="post-body">
+      <p>Wo-Hoo!</p>
+
+      <blockquote>
+       嘿嘿
+      </blockquote>
+
+     
+    </div>
+
+    <div class="post-footer">
+      <a class="back-home" href="blog-main.html">← 返回首页</a>
+    </div>
+  </article>
+</main>
+
+<footer>
+  <p>GUMI Blog · 由 <span class="heart">♥</span> 与 GitHub Pages 驱动</p>
+</footer>
+
+</body>
+</html>
