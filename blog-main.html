@@ -337,6 +337,19 @@ a{text-decoration:none}
     const nr=document.getElementById('post-no-result');
     if(!Array.isArray(arr)||!arr.length||!box) return;
     const names=arr.map(f=>f.name).filter(n=>n.endsWith('.json')).sort((a,b)=>b.localeCompare(a));
+    // 逐帖拉取 webVisible/visibleTo：网页只展示 webVisible!=false 且无名单限制的帖子
+    const visible=[];
+    await Promise.all(names.map(async n=>{
+      try{
+        const r2=await fetch('https://api.github.com/repos/ZhangYichen-max/ZhangYichen-max.github.io/contents/posts/'+encodeURIComponent(n));
+        if(!r2.ok) return;
+        const f2=await r2.json();
+        const pj=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(f2.content.replace(/\s/g,'')),c=>c.charCodeAt(0))));
+        if(pj.webVisible===false||Array.isArray(pj.visibleTo)) return;
+        visible.push(n);
+      }catch(e){}
+    }));
+    names.length=0;names.push(...visible.sort((a,b)=>b.localeCompare(a)));
     const frag=names.map(n=>{
       const base=n.slice(0,-5), f=base.split('-');
       if(f.length<3) return '';
