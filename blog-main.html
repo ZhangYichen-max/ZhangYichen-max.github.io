@@ -331,5 +331,32 @@
 })();
 </script>
 
+<script>
+/* 动态文章列表：直连 GitHub API（匿名），文件名格式 <时间戳>-<作者>-<标题>.json */
+(async function(){
+  try{
+    const r=await fetch('https://api.github.com/repos/ZhangYichen-max/ZhangYichen-max.github.io/contents/posts');
+    const arr=await r.json();
+    const box=document.querySelector('.post-list');
+    const nr=document.getElementById('post-no-result');
+    if(!Array.isArray(arr)||!arr.length||!box) return;
+    const names=arr.map(f=>f.name).filter(n=>n.endsWith('.json')).sort((a,b)=>b.localeCompare(a));
+    const frag=names.map(n=>{
+      const base=n.slice(0,-5), f=base.split('-');
+      if(f.length<3) return '';
+      let title=f.slice(2).join('-');
+      try{title=decodeURIComponent(title);}catch(e){}
+      let date='';
+      try{date=new Date(parseInt(f[0],10)).toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g,'-');}catch(e){}
+      const a=document.createElement('a');
+      a.className='post-card';
+      a.href='post.html?id='+encodeURIComponent(n);
+      a.innerHTML='<div class="post-meta"><span>'+date+'</span><span class="tag">'+f[1]+'</span></div><h2>'+title+'</h2>';
+      return a;
+    }).filter(Boolean);
+    frag.forEach(a=>box.insertBefore(a,nr));
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
