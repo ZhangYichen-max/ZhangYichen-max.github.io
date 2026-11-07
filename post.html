@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章 · GUMI Blog</title>
+<style>
+:root{--green:#10b981;--green-dark:#0d9488;--green-deep:#065f46;--mint:#ecfdf5;--mint-2:#d1fae5;
+--ink:#1f2937;--ink-soft:#4b5563;--card:#fff;--bg:#f6faf8;--border:#e2e8f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--ink);line-height:1.85}
+header{background:linear-gradient(315deg,var(--mint) 0%,var(--mint-2) 45%,#a7f3d0 100%);border-bottom:1px solid var(--border)}
+.nav{max-width:860px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--green-deep)}
+.nav-links a{padding:6px 14px;border-radius:999px;font-size:.95rem;color:var(--ink-soft)}
+.nav-links a:hover{background:rgba(255,255,255,.7);color:var(--green-dark)}
+main{max-width:860px;margin:0 auto;padding:40px 20px}
+article{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 2px 12px rgba(16,185,129,.08);padding:26px 28px}
+.post-meta{display:flex;gap:8px;align-items:center}
+.post-meta span{background:var(--mint-2);color:var(--green-dark);border-radius:999px;padding:1px 10px 2px;font-size:.8rem}
+h1{color:var(--green-deep);font-size:1.7rem;margin:12px 0 8px}
+.post-body{margin-top:10px;white-space:pre-wrap}
+.post-footer{margin-top:26px;border-top:1px solid var(--border);padding-top:16px}
+.back-home{display:inline-block;background:var(--green);color:#fff;padding:8px 22px;border-radius:999px;font-size:.9rem}
+</style>
+</head>
+<body>
+<header><nav class="nav">
+<a class="logo" href="blog-main.html"><svg width="30" height="30" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="#10b981"/><path d="M13 24c0-4 3-7 7-7s7 3 7 7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="15.5" cy="16" r="1.8" fill="#fff"/><circle cx="24.5" cy="16" r="1.8" fill="#fff"/></svg>
+<span>GUMI Blog</span></a>
+<div class="nav-links"><a href="blog-main.html">首页</a><a href="blog-about.html">关于</a></div>
+</nav></header>
+<main><article id="article"><p style="color:#6b7280">加载中…</p></article></main>
+<script>
+(async function(){
+  const id=new URLSearchParams(location.search).get('id');
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  try{
+    const r=await fetch('https://api.github.com/repos/ZhangYichen-max/ZhangYichen-max.github.io/contents/posts/'+encodeURIComponent(id));
+    if(!r.ok) throw 0;
+    const f=await r.json();
+    const p=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(f.content.replace(/\s/g,'')),c=>c.charCodeAt(0))));
+    const box=document.getElementById('article');
+    box.innerHTML='<div class="post-meta"><span>'+esc(p.date)+'</span><span>'+esc(p.author)+'</span></div>'
+      +'<h1>'+esc(p.title)+'</h1><div class="post-body">'+esc(p.content)+'</div>'
+      +'<div class="post-footer"><a class="back-home" href="blog-main.html">← 返回首页</a></div>';
+    document.title=p.title+' · GUMI Blog';
+  }catch(e){document.getElementById('article').innerHTML='<p>加载失败，请刷新重试</p>';}
+})();
+</script>
+</body>
+</html>
