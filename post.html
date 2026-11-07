@@ -59,7 +59,7 @@ a{text-decoration:none}
       html_body+='<p>'+h+'</p>';
     });
     const box=document.getElementById('article');
-    if(p.bg){document.body.style.backgroundImage='url(gumi.jpg)';document.body.style.backgroundSize='cover';document.body.style.backgroundPosition='center';document.body.style.backgroundAttachment='fixed';}
+    
     let html='<div class="post-meta"><span>'+esc(p.date)+'</span><span>'+esc(p.author)+(p.mood?' · '+esc(p.mood):'')+'</span></div>'
       +'<h1>'+esc(p.title)+'</h1><div class="post-body">'+html_body+'</div>';
     // 回帖区（网页仅显示公开回帖：webVisible!=false 且无可见名单）
