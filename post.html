@@ -60,8 +60,8 @@ a{text-decoration:none}
     const box=document.getElementById('article');
     let html='<div class="post-meta"><span>'+esc(p.date)+'</span><span>'+esc(p.author)+'</span></div>'
       +'<h1>'+esc(p.title)+'</h1><div class="post-body">'+html_body+'</div>';
-    // 回帖区
-    const reps=p.replies||[];
+    // 回帖区（网页仅显示公开回帖：webVisible!=false 且无可见名单）
+    const reps=(p.replies||[]).filter(r=>r.webVisible!==false&&!Array.isArray(r.visibleTo));
     html+='<div style="margin-top:28px;padding-top:16px;border-top:1px solid var(--border)">'
       +'<h3 style="color:var(--green-deep);font-size:1rem;margin-bottom:10px">回帖（'+reps.length+'）</h3>';
     if(!reps.length){
