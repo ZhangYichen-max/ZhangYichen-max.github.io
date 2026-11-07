@@ -40,9 +40,25 @@ h1{color:var(--green-deep);font-size:1.7rem;margin:12px 0 8px}
     if(!r.ok) throw 0;
     const f=await r.json();
     const p=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(f.content.replace(/\s/g,'')),c=>c.charCodeAt(0))));
+    // 轻量语法：```代码块```、`code`、**加粗**（先转义再替换）
+    const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const blocks=[];let c0=p.content||'';
+    c0=c0.replace(/```([\s\S]*?)```/g,(m,b)=>{blocks.push(b.replace(/^\n/,''));return '\u0000'+(blocks.length-1)+'\u0000';});
+    let html='';
+    c0.split(/\n{2,}/).forEach(para=>{
+      let t=para.trim();if(!t)return;
+      const bm=t.match(/^\u0000(\d+)\u0000$/);
+      if(bm){html+='<pre style="background:#0f2e24;color:#a7f3d0;border-radius:12px;padding:14px 18px;overflow-x:auto;font-family:Menlo,Consolas,monospace;font-size:.85rem;white-space:pre">'+esc(blocks[bm[1]])+'</pre>';return;}
+      let h=esc(t);
+      h=h.replace(/\u0000(\d+)\u0000/g,(m,i)=>'<code style="background:#ecfdf5;color:#0d9488;padding:1px 6px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:.9em">'+esc(blocks[i]).replace(/\n/g,'<br/>')+'</code>');
+      h=h.replace(/`(.[^`]*)`/g,'<code style="background:#ecfdf5;color:#0d9488;padding:1px 6px;border-radius:6px;font-family:Menlo,Consolas,monospace;font-size:.9em">$1</code>');
+      h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+      h=h.replace(/\n/g,'<br/>');
+      html+='<p>'+h+'</p>';
+    });
     const box=document.getElementById('article');
     box.innerHTML='<div class="post-meta"><span>'+esc(p.date)+'</span><span>'+esc(p.author)+'</span></div>'
-      +'<h1>'+esc(p.title)+'</h1><div class="post-body">'+esc(p.content)+'</div>'
+      +'<h1>'+esc(p.title)+'</h1><div class="post-body">'+html+'</div>'
       +'<div class="post-footer"><a class="back-home" href="blog-main.html">← 返回首页</a></div>';
     document.title=p.title+' · GUMI Blog';
   }catch(e){document.getElementById('article').innerHTML='<p>加载失败，请刷新重试</p>';}
