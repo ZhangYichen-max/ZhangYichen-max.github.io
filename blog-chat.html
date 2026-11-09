@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>私聊 · GUMI Blog</title>
+<style>
+  :root{
+    --green:#10b981;
+    --green-dark:#0d9488;
+    --green-deep:#065f46;
+    --mint:#ecfdf5;
+    --mint-2:#d1fae5;
+    --ink:#1f2937;
+    --ink-soft:#4b5563;
+    --card:#ffffff;
+    --bg:#f6faf8;
+    --border:#e2e8f0;
+    --shadow:0 2px 12px rgba(16,185,129,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.75;
+  }
+  a{color:var(--green-dark);text-decoration:none;transition:color .2s}
+  a:hover{color:var(--green)}
+
+  /* ---- 顶部导航 ---- */
+  header{
+    background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 55%,#a7f3d0 100%);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:10;backdrop-filter:blur(8px);
+  }
+  .nav{
+    max-width:860px;margin:0 auto;padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--green-deep)}
+  .logo svg{flex:none}
+  .logo:hover .logo-text{color:var(--green-dark)}
+  .nav-links{display:flex;gap:6px}
+  .nav-links a{
+    padding:6px 14px;border-radius:999px;font-size:.95rem;color:var(--ink-soft);
+  }
+  .nav-links a:hover{background:rgba(255,255,255,.7);color:var(--green-dark)}
+  .nav-links a.active{background:var(--green);color:#fff}
+  .nav-links a.dl-app{background:var(--green);color:#fff;font-weight:600}
+  .nav-links a.dl-app:hover{background:var(--green-dark);color:#fff;transform:translateY(-1px)}
+
+
+  /* ---- Hero ---- */
+  .hero{
+    max-width:860px;margin:0 auto;padding:56px 20px 40px;
+    display:flex;align-items:center;justify-content:space-between;gap:36px;
+  }
+  .hero-text{flex:1;text-align:center;min-width:0}
+  .hero h1{
+    font-size:2rem;letter-spacing:.5px;color:var(--green-deep);margin-bottom:10px;
+  }
+  .hero p{color:var(--ink-soft);max-width:520px;margin:0 auto}
+
+  /* ---- 立绘（Hero 区） ---- */
+  .hero-art{
+    flex:none;width:230px;border-radius:18px;
+    box-shadow:0 10px 36px rgba(16,185,129,.28);
+    border:4px solid #fff;
+    animation:floaty 5s ease-in-out infinite;
+  }
+  .hero-art:hover{animation-play-state:paused}
+  @keyframes floaty{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+  }
+
+  /* ---- 侧边停靠图标 ---- */
+  #gumi-dock{
+    position:fixed;right:0;top:50%;z-index:50;
+    width:56px;height:56px;margin-top:-28px;
+    border-radius:50% 0 0 50%;
+    cursor:pointer;
+    background:linear-gradient(135deg,var(--green),#34d399);
+    border:none;
+    box-shadow:0 4px 18px rgba(16,185,129,.4);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:translateX(100%);
+    transition:opacity .35s,transform .35s;
+  }
+  #gumi-dock:hover{box-shadow:0 4px 26px rgba(16,185,129,.6)}
+  #gumi-dock.show{opacity:1;transform:translateX(0)}
+  #gumi-dock svg{flex:none}
+  #gumi-dock .chev{
+    position:absolute;left:7px;top:50%;transform:translateY(-50%);
+    animation:nudge 1.6s ease-in-out infinite;
+  }
+  @keyframes nudge{
+    0%,100%{transform:translate(-2px,-50%);opacity:.65}
+    50%{transform:translate(2px,-50%);opacity:1}
+  }
+
+  /* ---- 展开的立绘面板 ---- */
+  #gumi-panel{
+    position:fixed;right:18px;top:50%;z-index:51;
+    width:210px;max-width:70vw;
+    border-radius:18px;overflow:hidden;cursor:pointer;
+    border:4px solid #fff;
+    box-shadow:0 12px 44px rgba(16,185,129,.4);
+    opacity:0;visibility:hidden;
+    transform:translateY(-50%) translateX(120%) scale(.8);
+    transition:opacity .35s,transform .35s cubic-bezier(.34,1.56,.64,1),visibility .35s;
+  }
+  #gumi-panel img{width:100%;display:block}
+  #gumi-panel.open{
+    opacity:1;visibility:visible;
+    transform:translateY(-50%) translateX(0) scale(1);
+  }
+
+  /* ---- 主体 ---- */
+  main{max-width:860px;margin:0 auto;padding:10px 20px 60px}
+  .section-title{
+    display:flex;align-items:center;gap:10px;
+    font-size:1.2rem;color:var(--green-deep);margin:30px 0 18px;font-weight:700;
+  }
+  .section-title::before{content:"";width:4px;height:20px;border-radius:2px;background:var(--green)}
+
+  .post-list{display:flex;flex-direction:column;gap:18px}
+  .post-card{
+    text-decoration:none;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:22px 24px;box-shadow:var(--shadow);
+    transition:transform .2s,box-shadow .2s,border-color .2s;
+    display:block;color:inherit;
+  }
+  .post-card:hover{
+    transform:translateY(-3px);box-shadow:0 8px 24px rgba(16,185,129,.15);
+    border-color:var(--mint-2);
+  }
+  .post-meta{font-size:.85rem;color:#6b7280;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+  .tag{
+    display:inline-block;padding:1px 10px;border-radius:999px;font-size:.78rem;
+    background:var(--mint-2);color:var(--green-dark);
+  }
+  .post-card h2{font-size:1.15rem;color:var(--ink);margin-bottom:6px}
+  .post-card p{font-size:.92rem;color:var(--ink-soft)}
+
+  /* ---- 搜索 ---- */
+  .search-wrap{display:flex;justify-content:center;margin:14px 0 20px}
+  .search-box{
+    width:100%;max-width:460px;
+    display:flex;align-items:center;gap:10px;
+    padding:10px 18px;border-radius:999px;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+    border:1px solid rgba(16,185,129,.25);
+    box-shadow:0 2px 12px rgba(16,185,129,.12);
+    transition:box-shadow .2s,border-color .2s;
+  }
+  .search-box:focus-within{border-color:var(--green);box-shadow:0 4px 18px rgba(16,185,129,.25)}
+  .search-box svg{flex:none;color:var(--green-dark)}
+  .search-box input{flex:1;border:none;outline:none;background:transparent;font-size:.98rem;font-family:inherit;color:var(--ink);min-width:0}
+  .search-box input::placeholder{color:#94a3b8}
+  .search-clear{
+    border:none;background:var(--mint-2,#d1fae5);color:#0d9488;
+    width:24px;height:24px;border-radius:50%;cursor:pointer;flex:none;
+    display:none;align-items:center;justify-content:center;font-size:14px;line-height:1;
+  }
+  .search-clear.show{display:flex}
+  .post-card[hidden]{display:none}
+  .no-result{display:none;text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:.95rem}
+  .no-result.show{display:block}
+  .no-result b{color:var(--green-deep)}
+
+  /* ---- 页脚 ---- */
+  footer{
+    border-top:1px solid var(--border);
+    text-align:center;padding:26px 20px;color:#9ca3af;font-size:.85rem;
+  }
+  footer .heart{color:var(--green)}
+
+  @media (max-width:700px){
+    .hero{flex-direction:column-reverse;gap:24px;padding:32px 16px 28px}
+    .hero-art{width:56%;max-width:200px}
+    #gumi-dock{width:46px;height:46px;margin-top:-23px}
+    #gumi-dock svg{transform:scale(.85)}
+    #gumi-panel{width:150px}
+  }
+  @media (max-width:560px){
+    .hero h1{font-size:1.6rem}
+    .nav{padding:12px 16px}
+    .post-card{padding:18px}
+  }
+a{text-decoration:none}
+</style>
+<style>
+  .chat-wrap{max-width:860px;margin:24px auto;padding:0 20px;display:grid;grid-template-columns:220px 1fr;gap:16px}
+  .friends{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow);align-self:start}
+  .friends h3{font-size:.95rem;color:var(--green-deep);margin:0 0 10px}
+  .friend-chip{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;font-size:.92rem;color:var(--ink);margin-bottom:4px}
+  .friend-chip:hover{background:var(--mint)}
+  .friend-chip.on{background:var(--mint-2);border-color:var(--green);color:var(--green-deep);font-weight:600}
+  .msgs{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);min-height:320px}
+  .msg{margin-bottom:14px}
+  .msg .m-meta{font-size:.78rem;color:#0d9488;margin-bottom:3px}
+  .msg .m-body{background:var(--mint);border-radius:12px;padding:10px 14px;font-size:.92rem;white-space:pre-wrap;word-break:break-word}
+  .msg.mine .m-meta{color:#6b7280}
+  .msg.mine .m-body{background:var(--mint-2)}
+  .note{background:var(--mint);border:1px dashed var(--green);border-radius:12px;padding:10px 16px;font-size:.85rem;color:var(--green-deep);max-width:860px;margin:0 auto 20px}
+  @media(max-width:640px){.chat-wrap{grid-template-columns:1fr}.friends{order:2}}
+</style>
+</head>
+<body>
+<header><nav class="nav">
+<a class="logo" href="blog-main.html"><svg width="30" height="30" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="#10b981"/><path d="M13 24c0-4 3-7 7-7s7 3 7 7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="15.5" cy="16" r="1.8" fill="#fff"/><circle cx="24.5" cy="16" r="1.8" fill="#fff"/></svg>
+<span>GUMI Blog</span></a>
+<div class="nav-links"><a href="blog-main.html">首页</a><a href="#" class="active">私聊</a><a href="blog-about.html">关于</a><span id="gw-nav-login" style="display:flex;align-items:center;gap:8px"></span></div>
+</nav></header>
+
+<main>
+  <div class="note" id="note" style="margin-top:20px">💬 网页版仅可<b>查看</b>私聊记录，发送请使用手机 App / Windows 客户端。</div>
+  <div id="login-tip" style="max-width:860px;margin:30px auto;text-align:center;color:#6b7280;display:none">
+    <p>请先<a href="javascript:void 0" id="chat-login" style="color:#0d9488;font-weight:600">登录</a>后查看私聊。</p>
+  </div>
+  <div class="chat-wrap" id="chat-wrap" style="display:none">
+    <div class="friends"><h3>好友</h3><div id="friend-list"><p style="font-size:.85rem;color:#6b7280">加载中…</p></div></div>
+    <div class="msgs" id="msgs"><p style="color:#6b7280;font-size:.9rem">← 选择一位好友查看聊天</p></div>
+  </div>
+</main>
+
+<footer>
+  <p>GUMI Blog · 由 <span class="heart">♥</span> 驱动</p>
+</footer>
+
+<script src="gumi-web.js"></script>
+<script>
+(function(){
+  var API='https://api.github.com/repos/ZhangYichen-max/ZhangYichen-max.github.io/contents/';
+  function b64(s){return new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,'')),c=>c.charCodeAt(0)));}
+  function chatFile(a,b){return a<b?'chat_'+a+'-'+b+'.json':'chat_'+b+'-'+a+'.json';}
+
+  function load(){
+    var me=GumiWeb.user();
+    document.getElementById('login-tip').style.display=me?'none':'block';
+    document.getElementById('chat-wrap').style.display=me?'grid':'none';
+    document.getElementById('note').style.display=me?'block':'none';
+    if(me) loadFriends(me);
+  }
+  function loadFriends(me){
+    fetch(API+'friends_'+encodeURIComponent(me)+'.json').then(function(r){
+      if(!r.ok) throw 0; return r.json();
+    }).then(function(f){
+      var arr=JSON.parse(b64(f.content));
+      var box=document.getElementById('friend-list');
+      box.innerHTML='';
+      if(!arr.length){box.innerHTML='<p style="font-size:.85rem;color:#6b7280">还没有好友，去 App 里加吧</p>';return;}
+      arr.forEach(function(name){
+        var b=document.createElement('button');
+        b.className='friend-chip';
+        b.textContent=name;
+        b.onclick=function(){
+          Array.prototype.forEach.call(box.children,function(c){c.classList.remove('on');});
+          b.classList.add('on');
+          loadChat(me,name);
+        };
+        box.appendChild(b);
+      });
+    }).catch(function(){
+      document.getElementById('friend-list').innerHTML='<p style="font-size:.85rem;color:#6b7280">好友列表加载失败（或你还没有好友文件）</p>';
+    });
+  }
+  function loadChat(me,who){
+    var box=document.getElementById('msgs');
+    box.innerHTML='<p style="color:#6b7280;font-size:.9rem">加载中…</p>';
+    fetch(API+encodeURIComponent(chatFile(me,who))).then(function(r){
+      if(!r.ok) throw 0; return r.json();
+    }).then(function(f){
+      var arr=JSON.parse(b64(f.content));
+      var html='<h3 style="margin:0 0 14px;color:var(--green-deep);font-size:1.05rem">与 '+who+' 的私聊</h3>';
+      if(!arr.length) html+='<p style="color:#6b7280;font-size:.9rem">还没有消息</p>';
+      arr.forEach(function(m){
+        var mine=m.from===me;
+        html+='<div class="msg'+(mine?' mine':'')+'"><div class="m-meta">'+(mine?'我':m.from)+' · '+m.time+'</div><div class="m-body">'+String(m.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div></div>';
+      });
+      box.innerHTML=html;
+    }).catch(function(){
+      box.innerHTML='<p style="color:#6b7280;font-size:.9rem">聊天记录加载失败</p>';
+    });
+  }
+  document.getElementById('chat-login').onclick=function(){ GumiWeb.openLogin(load); };
+  GumiWeb.renderNav(load);
+  load();
+})();
+</script>
+</body>
+</html>
