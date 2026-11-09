@@ -211,7 +211,9 @@ a{text-decoration:none}
     <div class="nav-links">
       <a href="index.html">回主站</a>
       <a href="#" class="active">首页</a>
+      <a href="blog-chat.html">私聊</a>
       <a href="blog-about.html">关于</a>
+      <span id="gw-nav-login" style="display:flex;align-items:center;gap:8px"></span>
     </div>
   </nav>
 </header>
@@ -327,6 +329,10 @@ a{text-decoration:none}
 })();
 </script>
 
+<script src="gumi-web.js"></script>
+<script>
+GumiWeb.renderNav(function(){ location.reload(); });
+</script>
 <script>
 /* 动态文章列表：直连 GitHub API（匿名），文件名格式 <时间戳>-<作者>-<标题>.json */
 (async function(){
@@ -345,8 +351,16 @@ a{text-decoration:none}
         if(!r2.ok) return;
         const f2=await r2.json();
         const pj=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(f2.content.replace(/\s/g,'')),c=>c.charCodeAt(0))));
-        if(pj.webVisible===false||Array.isArray(pj.visibleTo)) return;
-        visible.push({n, mood:pj.mood||''});
+        const me=localStorage.getItem('gumi_user')||'';
+        let tag='';
+        if(Array.isArray(pj.visibleTo)){
+          if(!(me&&(me===pj.author||me==='Admin'||pj.visibleTo.includes(me)))) return;
+          tag=' 🔑';
+        }else if(pj.webVisible===false){
+          if(!me) return;
+          tag=' 🌐';
+        }
+        visible.push({n, mood:(pj.mood||'')+tag});
       }catch(e){}
     }));
     visible.sort((a,b)=>b.n.localeCompare(a.n));
